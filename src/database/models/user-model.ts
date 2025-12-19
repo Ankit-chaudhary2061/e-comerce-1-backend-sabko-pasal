@@ -1,4 +1,5 @@
 import { Model, Table, Column, DataType, PrimaryKey } from "sequelize-typescript";
+import { UserRole } from "../../middleware/auth-middleware";
 
 @Table({
     tableName: 'users',
@@ -35,5 +36,5 @@ export class User extends Model {
     type: DataType.ENUM("admin", "customer"),
     defaultValue: "customer",
   })
-  declare role: string;
+  declare role: UserRole;
 }
