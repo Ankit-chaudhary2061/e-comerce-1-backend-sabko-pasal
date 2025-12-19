@@ -2,14 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import jwt from 'jsonwebtoken'
 import { User } from '../database/models/user-model';
 
-interface IAuthRequest extends Request{
-    user?:{
-        username:string,
-        email:string,
-        password:string,
-        role:string,
-        id:string
-    }
+export interface IAuthRequest extends Request {
+  user?: {
+    username: string;
+    email: string;
+    password: string;
+    role: UserRole;
+    id: string;
+  };
 }
 export enum UserRole {
   ADMIN = "admin",
@@ -78,4 +78,6 @@ class AuthMiddleware{
     }
 }
 
+
+export default AuthMiddleware
 
