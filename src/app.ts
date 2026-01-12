@@ -4,8 +4,20 @@ import productRoutes from './routes/product/product-routes'
 import categoryRoutes from './routes/category/category-routes'
 import cartRoutes from  './routes/cart/cart-routes'
 import orderRoutes from  './routes/order/order-routes'
-const app = express ()
+import cors from "cors";
+
+
+const app = express();
+
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+    credentials: true,
+  })
+);
+
 
 app.use('/api',authRoutes)
 app.use('/api/admin',productRoutes)

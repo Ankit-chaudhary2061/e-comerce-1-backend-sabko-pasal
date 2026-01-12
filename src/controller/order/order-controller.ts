@@ -6,6 +6,9 @@ import Order from "../../database/models/order-model";
 import OrderDetails from "../../database/models/order-details";
 import axios from "axios";
 import Product from "../../database/models/product-model";
+import Cart from "../../database/models/cart-model";
+import { User } from "../../database/models/user-model";
+import Category from "../../database/models/category-model";
 class ExtendedOrder extends Order{
     declare paymentId :string | null
 }
@@ -35,13 +38,18 @@ class OrderController {
         totalAmount,
         paymentId :paymentData.id
       });
+      let responseOrderData
       // Create Order Details
       for (let i = 0; i < items.length; i++) {
-        await OrderDetails.create({
+      responseOrderData =   await OrderDetails.create({
         quantity: items[i].quantity,
          productId: items[i].productId,
           orderId: orderData.id
         });
+        await Cart.destroy({where:{
+          userId,
+          productId :items[i].productId
+        }})
       }
       if(paymentDetails.paymentMethod === PaymentMethod.KHALTI){
         const data = {
@@ -67,6 +75,7 @@ class OrderController {
     message: "Khalti payment initiated",
     pidx: khaltiData.pidx,
     payment_url: khaltiData.payment_url,
+    data:responseOrderData
   });
       }
         return res.status(201).json({
@@ -129,13 +138,43 @@ class OrderController {
     });
   }
 }
-static async fetchOrder(req:IAuthRequest, res:Response){
+static async fetchMyOrder(req:IAuthRequest, res:Response){
     try {
         const userId = req.user?.id
         const Orders =  await Order.findAll({
             where:{
                 userId
             },
+            include:[
+                {
+                    model:Payment
+                }
+            ]
+        })
+        if(Orders.length > 0 ){
+        res.status(200).json({
+            message : 'orders data succesfully fetched ',
+            data:Orders
+        })
+    }else{
+        res.status(400).json({
+            message:" you haven't order anything "
+        })
+    }
+    } catch (error: any) {
+      console.error("Order Create Error:", error);
+      return res.status(500).json({
+        message: "Server error",
+        error: error.message,
+        stack: error.stack,
+      });
+    }
+  }
+  static async fetchOrder(req:IAuthRequest, res:Response){
+    try {
+       
+        const Orders =  await Order.findAll({
+          
             include:[
                 {
                     model:Payment
@@ -170,8 +209,23 @@ static async fetchOrder(req:IAuthRequest, res:Response){
                 orderId
             },
             include:[{
-                model:Product
+                model:Product,
+                include:[{
+              model:Category,
+              attributes:["categoryName"]
             }]
+            },
+          {
+            model:Order,
+            include:[{
+              model:Payment,
+              attributes:["paymentMethod","paymentStatus"]
+            },{
+              model:User,
+              attributes:["username", "email"]
+
+            }]
+          }]
         })
 
       if(orderdetails.length > 0 ){
@@ -248,6 +302,7 @@ static async changeOrderStatus(req: IAuthRequest, res: Response) {
       return res.status(400).json({ message: "orderStatus is required" });
     }
 
+  
     // Validate enum value (IMPORTANT!)
     if (!Object.values(OrderStatus).includes(orderStatus)) {
       return res.status(400).json({ message: "Invalid orderStatus value" });

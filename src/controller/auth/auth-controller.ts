@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { User } from "../../database/models/user-model";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken'
+import { IAuthRequest } from "../../middleware/auth-middleware";
 export class AuthController {
   static async registerUser(req: Request, res: Response) {
     try {
@@ -81,6 +82,53 @@ export class AuthController {
     return res.status(500).json({ message: "Server error" });
   }
 }
+  static async fetchUser(req:IAuthRequest, res:Response){
+    try {
+       
+        const Users =  await User.findAll()
+        if(Users.length > 0 ){
+        res.status(200).json({
+            message : 'orders data succesfully fetched ',
+            data:Users
+        })
+    }else{
+        res.status(400).json({
+            message:" you haven't order anything "
+        })
+    }
+    } catch (error: any) {
+      console.error("Order Create Error:", error);
+      return res.status(500).json({
+        message: "Server error",
+        error: error.message,
+        stack: error.stack,
+      });
+    }
+  }
+    static async deleteUser(req:IAuthRequest, res:Response){
+    try {
+       const id  = req.params.id
+        const Users =  await User.destroy({
+          where:{
+            id :id
+          }
+        })
+     
+        res.status(200).json({
+            message : 'orders data succesfully fetched ',
+           
+        })
+   
+    
+    } catch (error: any) {
+      console.error("Order Create Error:", error);
+      return res.status(500).json({
+        message: "Server error",
+        error: error.message,
+        stack: error.stack,
+      });
+    }
+  }
 }
 
 

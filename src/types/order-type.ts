@@ -50,11 +50,10 @@ export enum TransactionStatus{
     REFUNDED = 'Refunded',
     INITIATED = 'Initiated'
 }
-export enum OrderStatus{
-    PENDING = 'Pending',
-    CANCELED = 'Canceled',
-    ONTHEWAY = 'ontheWay',
-    DELIVERED = 'Delivered',
-    PREPARATION = 'Preparation',
-    
+export enum OrderStatus {
+  PENDING = 'pending',
+  DELIVERED = 'delivered',
+  ONTHEWAY = 'ontheway',
+  CANCELED = 'cancelled',
+  PREPARATION = 'preparation',
 }

@@ -124,6 +124,7 @@ static async deleteCart(req:IAuthRequest, res:Response){
     try {
         const userId  =  req.user?.id
         const {productId} = req.params
+        console.log(productId, ':prouct id')
         const product =  await Product.findByPk(productId)
         if(!product){
            return res.status(400).json({
@@ -153,6 +154,8 @@ static async deleteCart(req:IAuthRequest, res:Response){
     });
   }
 }
+
+
 static async updateCart(req:IAuthRequest,res:Response){
     try {
        const userId = req.user?.id;

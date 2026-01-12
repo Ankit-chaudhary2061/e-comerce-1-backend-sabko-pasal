@@ -6,12 +6,14 @@ const router: Router = express.Router();
 
 // CUSTOMER
 router.post("/order", AuthMiddleWare.isLogedIn, OrderController.createOrder);
+router.get("/orders", AuthMiddleWare.isLogedIn, AuthMiddleWare.restrictTo(UserRole.ADMIN),OrderController.fetchOrder);
+
 router.post("/order/verify", AuthMiddleWare.isLogedIn, OrderController.verfyTransaction);
-router.get("/order", AuthMiddleWare.isLogedIn, OrderController.fetchOrder);
+router.get("/order", AuthMiddleWare.isLogedIn, OrderController.fetchMyOrder);
 router.get(
   "/order/:id",
   AuthMiddleWare.isLogedIn,
-  AuthMiddleWare.restrictTo(UserRole.CUSTOMER),
+  AuthMiddleWare.restrictTo(UserRole.CUSTOMER,UserRole.ADMIN),
   OrderController.fetchOrderDetails
 );
 
